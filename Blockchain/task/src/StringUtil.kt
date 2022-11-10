@@ -7,7 +7,6 @@ class StringUtil {
         fun applySha256(input: String): String {
             return try {
                 val digest = MessageDigest.getInstance("SHA-256")
-                /* Applies sha256 to our input */
                 val hash = digest.digest(input.toByteArray(charset("UTF-8")))
                 val hexString = StringBuilder()
                 for (elem in hash) {
