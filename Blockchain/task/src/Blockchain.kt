@@ -1,19 +1,18 @@
 package blockchain
 
-import java.util.concurrent.ThreadLocalRandom
+import java.util.*
 
 class Blockchain(zerosCnt: Int) {
     private val zeros: String = "0".repeat(zerosCnt)
 
     private val blocks = mutableListOf<Block>()
 
-    private var magicNumber = generateNumber()
     fun createBlock() {
         val prevBlock = blocks.getOrNull(blocks.lastIndex)
         val block = Block(
             prevBlock?.id?.plus(1) ?: 1,
             prevBlock?.currHash ?: "0",
-            magicNumber,
+            generateNumber(),
             System.currentTimeMillis(),
             System.currentTimeMillis()
         )
@@ -26,7 +25,7 @@ class Blockchain(zerosCnt: Int) {
 
     private fun checkZero(currHash: String) = !currHash.startsWith(zeros)
 
-    private fun generateNumber() = ThreadLocalRandom.current().nextLong(Long.MAX_VALUE)
+    private fun generateNumber() = Random().nextLong(Long.MAX_VALUE)
 
     fun validChain(): Boolean {
         if (blocks.size == 0) return true

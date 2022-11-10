@@ -5,6 +5,10 @@ data class Block(val id: Int, val prevHash: String, var magicNumber: Long, val t
     val currHash: String
         get() = StringUtil.applySha256("$id$timeStamp$prevHash$magicNumber")
 
+    private val seconds: Long
+        get() = (timeEnd - timeStamp) / 1000
+
+
     override fun toString() =
         """
             Block:
@@ -15,7 +19,7 @@ data class Block(val id: Int, val prevHash: String, var magicNumber: Long, val t
             $prevHash
             Hash of the block:
             $currHash
-            Block was generating for ${((timeEnd - timeStamp) / 1000).toInt()} seconds
+            Block was generating for $seconds seconds
         """
         .trimIndent()
 
