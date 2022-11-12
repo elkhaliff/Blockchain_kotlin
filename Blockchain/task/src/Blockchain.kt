@@ -5,17 +5,29 @@ import java.util.*
 class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
     private val isDebug = false // необходимость печати отладочной информации
 
+//    val chatBot: ChatBot
+
     @Volatile
     var stopMining = false
     private val zeros: String
         get() = "0".repeat(zerosCnt)
 
+    private var messages = ""
     private val blocks = mutableListOf<Block>()
     private val maxSecondForMining = 15 // Максимальное время нахождения блока с заданным количеством нулей
+
+    private val initMessage: Boolean
+        get() = (blocks.size > 0)
+
+    /*init {
+        chatBot = ChatBot(this)
+        chatBot.start()
+    }*/
 
     @Synchronized
     fun createBlock(idMiner: Long) {
         if (blocks.size >= chainCnt) { stopMining = true; return }
+        if (initMessage) addMessage(ChatBot.getAnyMessage())
 
         val prevBlock = blocks.getOrNull(blocks.lastIndex)
         val block = Block(idMiner,
@@ -23,7 +35,8 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
             prevBlock?.currHash ?: "0",
             generateNumber(),
             System.currentTimeMillis(),
-            System.currentTimeMillis()
+            System.currentTimeMillis(),
+            messages
         )
         while (checkZero(block.currHash)) {
             block.magicNumber = generateNumber()
@@ -33,6 +46,7 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
         if (validChain() && (blocks.size < chainCnt)) {
             blocks.add(block)
             testZero(block)
+            messages = ""
         }
         if (blocks.size >= chainCnt) stopMining = true
     }
@@ -48,6 +62,13 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
             block.shift = -zerosCnt
         }
         say(zeros)
+    }
+
+    @Synchronized
+    fun addMessage(message: String) {
+        if (!messages.isEmpty()) messages += "\n"
+        messages += message
+        say(message)
     }
 
     private fun checkZero(currHash: String) = !currHash.startsWith(zeros)
@@ -75,6 +96,7 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
         repeat(cntMiners) { miners.add(Miner(this)) }
         (0 until cntMiners).forEach { miners[it].start() }
         (0 until cntMiners).forEach { miners[it].join() }
+        //chatBot.join()
     }
 
     private fun say(msg: String) {
