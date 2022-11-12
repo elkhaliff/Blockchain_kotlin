@@ -3,7 +3,7 @@ package blockchain
 import java.util.*
 
 private val MESSAGES = listOf(
-    "Ash tree did not answer me, shaking his head.",
+/*    "Ash tree did not answer me, shaking his head.",
     "I asked the ash tree where my beloved is.",
     "I asked the poplar: \"Where is my beloved?\"",
     "The poplar showered me with autumn leaves.",
@@ -20,6 +20,13 @@ private val MESSAGES = listOf(
     "A friend answered a devotee, a friend answered a sincere one,",
     "You were loved, you were loved.",
     "You were loved, but my wife became."
+*/
+    "miner9 sent 10 VC to Bob",
+    "miner7 sent 10 VC to Alice",
+    "Nick sent 1 VC to ShoesShop",
+    "Nick sent 2 VC to FastFood",
+    "Nick sent 15 VC to CarShop",
+    "miner7 sent 90 VC to CarShop"
 )
 /*
 class ChatBot(private val blockchain: Blockchain): Thread() {
@@ -32,7 +39,7 @@ class ChatBot(private val blockchain: Blockchain): Thread() {
     }
 }
 */
-class ChatBot() {
+class ChatBot {
     companion object {
         fun getAnyMessage() = MESSAGES[Random().nextInt(MESSAGES.size - 1)]
     }

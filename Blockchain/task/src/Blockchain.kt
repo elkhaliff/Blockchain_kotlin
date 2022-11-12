@@ -9,12 +9,17 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
 
     @Volatile
     var stopMining = false
+
+    @Volatile
+    var currBlockId = 0
+
     private val zeros: String
         get() = "0".repeat(zerosCnt)
 
     private var messages = ""
     private val blocks = mutableListOf<Block>()
-    private val maxSecondForMining = 15 // Максимальное время нахождения блока с заданным количеством нулей
+    private val maxSecondForMining = 5 // Максимальное время нахождения блока с заданным количеством нулей
+    private val maxZeros = 4 // Максимальное количество 0
 
     private val initMessage: Boolean
         get() = (blocks.size > 0)
@@ -25,8 +30,9 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
     }*/
 
     @Synchronized
-    fun createBlock(idMiner: Long) {
-        if (blocks.size >= chainCnt) { stopMining = true; return }
+    fun createBlock(idMiner: Long): Block? {
+        if (blocks.size >= chainCnt) { stopMining = true; return null}
+        //if (initMessage) addMessage(ChatBot.getAnyMessage())
         if (initMessage) addMessage(ChatBot.getAnyMessage())
 
         val prevBlock = blocks.getOrNull(blocks.lastIndex)
@@ -38,22 +44,32 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
             System.currentTimeMillis(),
             messages
         )
-        while (checkZero(block.currHash)) {
-            block.magicNumber = generateNumber()
-            block.timeEnd = System.currentTimeMillis()
-        }
+        currBlockId = block.id
+        return block
+    }
 
-        if (validChain() && (blocks.size < chainCnt)) {
-            blocks.add(block)
-            testZero(block)
-            messages = ""
+    @Synchronized
+    fun testOrAddBlock(block: Block) {
+        if (checkZero(block.currHash)) {
+            say(block.currHash)
+            if (currBlockId == block.id && (blocks.size < chainCnt)) {
+                currBlockId = 0
+                block.timeEnd = System.currentTimeMillis()
+                testZero(block)
+                blocks.add(block)
+                println(block)
+                println()
+                messages = ""
+            }
+        } else {
+            block.magicNumber = generateNumber()
         }
         if (blocks.size >= chainCnt) stopMining = true
     }
 
     @Synchronized
     private fun testZero(block: Block) {
-        if (block.seconds < maxSecondForMining) {
+        if (block.seconds < maxSecondForMining && zerosCnt <= maxZeros) {
             zerosCnt++
             block.shift = zerosCnt
         }
@@ -66,12 +82,13 @@ class Blockchain(@Volatile var zerosCnt: Int, private val chainCnt: Int) {
 
     @Synchronized
     fun addMessage(message: String) {
-        if (!messages.isEmpty()) messages += "\n"
-        messages += message
+        /*if (messages.isNotEmpty()) messages += "\n"
+        messages += message*/
+        if (messages.isEmpty()) messages += message
         say(message)
     }
 
-    private fun checkZero(currHash: String) = !currHash.startsWith(zeros)
+    private fun checkZero(currHash: String) = currHash.startsWith(zeros)
 
     private fun generateNumber() = Random().nextLong(Long.MAX_VALUE)
 

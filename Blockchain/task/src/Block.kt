@@ -18,6 +18,7 @@ data class Block(val idMiner: Long, val id: Int, val prevHash: String, var magic
         """
             Block:
             Created by miner # $idMiner
+            miner$idMiner gets 100 VC
             Id: $id
             Timestamp: $timeStamp
             Magic number: $magicNumber
