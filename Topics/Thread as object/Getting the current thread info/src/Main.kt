@@ -1,3 +1,3 @@
-fun printCurrentThreadInfo() {
-    // get the thread and print its info
+fun printCurrentThreadInfo() = with(Thread.currentThread()) {
+    println("name: $name\npriority: $priority")
 }

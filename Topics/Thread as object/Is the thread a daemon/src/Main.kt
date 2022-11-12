@@ -1,0 +1,1 @@
+fun printIfDaemon(thread: Thread) = println(if (thread.isDaemon) "daemon" else "not daemon")
