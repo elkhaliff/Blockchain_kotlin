@@ -1,14 +1,8 @@
 package blockchain
 
 fun main() {
-    print("Enter how many zeros the hash must start with: ")
-    val zeros = readln().toInt()
-    println()
+    val blockchain = Blockchain(1, 5) // Инициализируем с одним "0", и ограничиваем 5 звеньями
+    blockchain.createMiners(10) // Запустили, работают, ждем
 
-    val blockchain = Blockchain(zeros)
-    repeat(5) {
-        blockchain.createBlock()
-        if (!blockchain.validChain()) println("Chain is NOT VALID!!!")
-    }
-    blockchain.printChain()
+    blockchain.printChain() // Печатаем что получилось
 }
