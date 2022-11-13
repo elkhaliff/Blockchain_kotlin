@@ -1,0 +1,1 @@
+class ValueIsNegative : Exception("Exception ValueIsNegative")
